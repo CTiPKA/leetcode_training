@@ -23,22 +23,30 @@ object Solutions_TasksUsingServers {
       serversPriorityQ += Server(priority=servers(i), index=i, endOfTask=0)
     }
 
-    var iterationIndex = 0
-    for (i<- 0 until tasks.length) {
+    var iterationSecond = 0
+    var taskIndex = 0
+    while (iterationSecond >= 0) {
       /** free server if any task(s) done */
-      while (tasksPriorityQ.nonEmpty && tasksPriorityQ.head.endOfTask <= iterationIndex) {
+      while (tasksPriorityQ.nonEmpty && tasksPriorityQ.head.endOfTask <= iterationSecond) {
         serversPriorityQ.enqueue(tasksPriorityQ.dequeue())
       }
 
       /** assign new task to server and adding to queue */
-      if (serversPriorityQ.nonEmpty) {
+      while (serversPriorityQ.nonEmpty && taskIndex < iterationSecond && taskIndex < tasks.length) {
         val topServer = serversPriorityQ.dequeue()
-        tasksPriorityQ.enqueue(Server(topServer.priority, topServer.index, iterationIndex + tasks(i)))
+        tasksPriorityQ.enqueue(Server(topServer.priority, topServer.index, iterationSecond + tasks(taskIndex)))
         serversUsage.append(topServer.index)
+        taskIndex += 1
       }
       /** if no server just wait */
 
-      iterationIndex += 1
+      if (taskIndex < tasks.length) {
+        /** just go to the next second */
+        iterationSecond += 1
+      } else {
+        /** processed all tasks */
+        iterationSecond = -1
+      }
     }
 
     serversUsage.toArray
